@@ -173,23 +173,26 @@ function suggestWeek() {
 
 async function callClaude(system, userMsg) {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system,
-        messages: [{ role: "user", content: userMsg }],
-      }),
-    });
+    const res = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_GEMINI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gemini-2.0-flash",
+          max_tokens: 1000,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: userMsg },
+          ],
+        }),
+      }
+    );
     const data = await res.json();
-    return data.content?.[0]?.text || "";
+    return data.choices?.[0]?.message?.content || "";
   } catch { return ""; }
 }
 
